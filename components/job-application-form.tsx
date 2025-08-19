@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import {
   ArrowLeft,
@@ -24,72 +25,128 @@ import {
   Briefcase,
   FileText,
   Send,
-  Sparkles,
   Eye,
   PartyPopper,
+  GraduationCap,
 } from "lucide-react";
-import myLogo from "../public/logomark.png";
 import Image from "next/image";
+import myLogo from "../public/brightlight.jpg";
 
 interface FormData {
-  // Step 1
+  // Section 1 - Personal Info
   fullName: string;
   email: string;
   phone: string;
+  education: string;
+  fieldOfStudy: string;
+  position: string;
 
-  // Step 2
-  role: string;
-
-  // Step 3 - Dynamic based on role
-  socialMediaExperience?: string;
-  portfolioLink?: string;
-  socialMediaTools?: string;
-  contentCreation?: string;
-  emailMarketing?: string;
-  livesInArea?: string;
-  socialMediaPages?: string;
-
-  itExpertise?: string;
+  // School Teacher Questions
+  teachingQualification?: string;
   teachingExperience?: string;
-  explainConcepts?: string;
-  lmsPlatforms?: string;
-  itPortfolioLink?: string;
+  subjects?: string[];
+  gradeLevels?: string[];
+  curriculum?: string[];
+  classroomManagement?: string;
+  engageStudents?: string;
+  lessonPlans?: string;
+  availability?: string;
 
-  curriculumExperience?: string;
-  needsAnalysis?: string;
-  curriculumPortfolioLink?: string;
-  toolsProficiency?: string;
-  evaluateEffectiveness?: string;
+  // Bus Assistant Questions
+  busAssistantRole?: string;
+  childExperience?: string;
+  morningAfternoonAvailable?: string;
+  childSafety?: string;
 
-  // Step 4
+  // School Cleaner Questions
+  schoolEnvironmentExperience?: string;
+  livesNearSchool?: string;
+  startAvailability?: string;
+
+  // Child Minder Questions
+  childMindingExperience?: string;
+  outdoorSafety?: string;
+  workWithTeacher?: string;
+  multipleChildren?: string;
+
+  // Files
   coverLetter?: File;
   resume?: File;
 }
 
 const steps = [
   { id: 1, title: "Personal Info", icon: User },
-  { id: 2, title: "Role Selection", icon: Briefcase },
-  { id: 3, title: "Role Questions", icon: FileText },
-  { id: 4, title: "Upload Documents", icon: Upload },
-  { id: 5, title: "Review & Submit", icon: Eye },
+  { id: 2, title: "Role Questions", icon: Briefcase },
+  { id: 3, title: "Upload Documents", icon: Upload },
+  { id: 4, title: "Review & Submit", icon: Eye },
 ];
 
-const roles = ["Social Media Manager", "IT Tutor", "Curriculum Designer"];
+const positions = [
+  "School Teacher",
+  "School Cleaner",
+  "Bus Assistant",
+  "Assistant School Teacher",
+  "Child Minder",
+];
+
+const educationLevels = [
+  "SSCE",
+  "NCE",
+  "OND",
+  "HND",
+  "BACHELORS DEGREE",
+  "MASTER DEGREE",
+];
+
+const subjects = [
+  "Mathematics",
+  "English Language",
+  "Science",
+  "Social Studies",
+  "Arts & Crafts",
+  "Music",
+  "Physical Education",
+];
+
+const gradeLevels = [
+  "Early Years / Pre-K",
+  "Kindergarten",
+  "Lower Primary (Grades 1–3)",
+  "Upper Primary (Grades 4–6)",
+];
+
+const curriculumOptions = [
+  "British Curriculum (e.g., EYFS, Key Stages, IGCSE, A-Levels)",
+  "American Curriculum",
+  "Nigerian Curriculum (e.g., UBE, WAEC, NECO)",
+  "International Baccalaureate (IB)",
+  "Montessori",
+  "Cambridge Curriculum",
+  "Canadian Curriculum",
+  "French Curriculum",
+  "No, I haven't worked with any specific curriculum",
+];
 
 export default function JobApplicationForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
     phone: "",
-    role: "",
+    education: "",
+    fieldOfStudy: "",
+    position: "",
+    subjects: [],
+    gradeLevels: [],
+    curriculum: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
-  const updateFormData = (field: string, value: string | File) => {
+  const updateFormData = (field: string, value: string | File | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -106,69 +163,67 @@ export default function JobApplicationForm() {
       else if (!/\S+@\S+\.\S+/.test(formData.email))
         newErrors.email = "Invalid email format";
       if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-      else if (
-        !/^\+\d{1,3}\d{10,14}$/.test(formData.phone.replace(/\s/g, ""))
-      ) {
-        newErrors.phone = "Phone must include country code (e.g., +1234567890)";
-      }
+      if (!formData.education)
+        newErrors.education = "Education level is required";
+      if (!formData.fieldOfStudy.trim())
+        newErrors.fieldOfStudy = "Field of study is required";
+      if (!formData.position) newErrors.position = "Position is required";
     }
 
     if (step === 2) {
-      if (!formData.role) newErrors.role = "Please select a role";
+      if (formData.position === "School Teacher" || formData.position === "Assistant School Teacher") {        if (!formData.teachingQualification)
+          newErrors.teachingQualification = "This field is required";
+        if (!formData.teachingExperience?.trim())
+          newErrors.teachingExperience = "This field is required";
+        if (!formData.subjects || formData.subjects.length === 0)
+          newErrors.subjects = "Please select at least one subject";
+        if (!formData.gradeLevels || formData.gradeLevels.length === 0)
+          newErrors.gradeLevels = "Please select at least one grade level";
+        if (!formData.curriculum || formData.curriculum.length === 0)
+          newErrors.curriculum = "Please select at least one curriculum option";
+        if (!formData.classroomManagement?.trim())
+          newErrors.classroomManagement = "This field is required";
+        if (!formData.engageStudents?.trim())
+          newErrors.engageStudents = "This field is required";
+        if (!formData.lessonPlans)
+          newErrors.lessonPlans = "Please select an option";
+        if (!formData.availability?.trim())
+          newErrors.availability = "This field is required";
+      }
+
+      if (formData.position === "Bus Assistant") {
+        if (!formData.busAssistantRole?.trim())
+          newErrors.busAssistantRole = "This field is required";
+        if (!formData.childExperience?.trim())
+          newErrors.childExperience = "This field is required";
+        if (!formData.morningAfternoonAvailable?.trim())
+          newErrors.morningAfternoonAvailable = "This field is required";
+        if (!formData.childSafety?.trim())
+          newErrors.childSafety = "This field is required";
+      }
+
+      if (formData.position === "School Cleaner") {
+        if (!formData.schoolEnvironmentExperience?.trim())
+          newErrors.schoolEnvironmentExperience = "This field is required";
+        if (!formData.livesNearSchool?.trim())
+          newErrors.livesNearSchool = "This field is required";
+        if (!formData.startAvailability?.trim())
+          newErrors.startAvailability = "This field is required";
+      }
+
+      if (formData.position === "Child Minder") {
+        if (!formData.childMindingExperience?.trim())
+          newErrors.childMindingExperience = "This field is required";
+        if (!formData.outdoorSafety?.trim())
+          newErrors.outdoorSafety = "This field is required";
+        if (!formData.workWithTeacher?.trim())
+          newErrors.workWithTeacher = "This field is required";
+        if (!formData.multipleChildren?.trim())
+          newErrors.multipleChildren = "This field is required";
+      }
     }
 
     if (step === 3) {
-      if (formData.role === "Social Media Manager") {
-        if (!formData.socialMediaExperience?.trim())
-          newErrors.socialMediaExperience = "This field is required";
-        if (!formData.portfolioLink?.trim())
-          newErrors.portfolioLink = "Portfolio link is required";
-        else if (!/^https?:\/\/.+/.test(formData.portfolioLink))
-          newErrors.portfolioLink = "Must be a valid URL";
-        if (!formData.socialMediaTools?.trim())
-          newErrors.socialMediaTools = "This field is required";
-        if (!formData.contentCreation)
-          newErrors.contentCreation = "Please select an option";
-        if (!formData.emailMarketing?.trim())
-          newErrors.emailMarketing = "This field is required";
-        if (!formData.livesInArea)
-          newErrors.livesInArea = "Please select an option";
-        if (!formData.socialMediaPages?.trim())
-          newErrors.socialMediaPages = "This field is required";
-      }
-
-      if (formData.role === "IT Tutor") {
-        if (!formData.itExpertise?.trim())
-          newErrors.itExpertise = "This field is required";
-        if (!formData.teachingExperience?.trim())
-          newErrors.teachingExperience = "This field is required";
-        if (!formData.explainConcepts?.trim())
-          newErrors.explainConcepts = "This field is required";
-        if (!formData.lmsPlatforms?.trim())
-          newErrors.lmsPlatforms = "This field is required";
-        if (!formData.itPortfolioLink?.trim())
-          newErrors.itPortfolioLink = "Portfolio link is required";
-        else if (!/^https?:\/\/.+/.test(formData.itPortfolioLink))
-          newErrors.itPortfolioLink = "Must be a valid URL";
-      }
-
-      if (formData.role === "Curriculum Designer") {
-        if (!formData.curriculumExperience?.trim())
-          newErrors.curriculumExperience = "This field is required";
-        if (!formData.needsAnalysis?.trim())
-          newErrors.needsAnalysis = "This field is required";
-        if (!formData.curriculumPortfolioLink?.trim())
-          newErrors.curriculumPortfolioLink = "Portfolio link is required";
-        else if (!/^https?:\/\/.+/.test(formData.curriculumPortfolioLink))
-          newErrors.curriculumPortfolioLink = "Must be a valid URL";
-        if (!formData.toolsProficiency?.trim())
-          newErrors.toolsProficiency = "This field is required";
-        if (!formData.evaluateEffectiveness?.trim())
-          newErrors.evaluateEffectiveness = "This field is required";
-      }
-    }
-
-    if (step === 4) {
       if (!formData.coverLetter)
         newErrors.coverLetter = "Cover letter is required";
       if (!formData.resume) newErrors.resume = "Resume is required";
@@ -180,7 +235,7 @@ export default function JobApplicationForm() {
 
   const nextStep = () => {
     if (currentStep === 0 || validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 5));
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
     }
   };
 
@@ -190,22 +245,38 @@ export default function JobApplicationForm() {
 
   const handleFileUpload = (field: string, file: File | null) => {
     if (file) {
-
-      const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
 
       if (file.size > maxSize) {
         setErrors((prev) => ({
           ...prev,
-          [field]: "File size must be less than 10MB. Please choose a smaller file.",
-        }))
-        return
+          [field]:
+            "File size must be less than 10MB. Please choose a smaller file.",
+        }));
+        return;
       }
 
-      // Clear any existing error for this field
       if (errors[field]) {
-        setErrors((prev) => ({ ...prev, [field]: "" }))
+        setErrors((prev) => ({ ...prev, [field]: "" }));
       }
+
       updateFormData(field, file);
+    }
+  };
+
+  const handleCheckboxChange = (
+    field: string,
+    value: string,
+    checked: boolean
+  ) => {
+    const currentValues = (formData[field as keyof FormData] as string[]) || [];
+    if (checked) {
+      updateFormData(field, [...currentValues, value]);
+    } else {
+      updateFormData(
+        field,
+        currentValues.filter((item) => item !== value)
+      );
     }
   };
 
@@ -223,7 +294,7 @@ export default function JobApplicationForm() {
           }
         });
 
-        const response = await fetch("https://usebasin.com/f/e1c50fe8a6e1", {
+        const response = await fetch("https://usebasin.com/f/cab5adc1635c", {
           method: "POST",
           body: form,
           headers: { Accept: "application/json" }, // 👈 Basin recommends this
@@ -262,36 +333,39 @@ export default function JobApplicationForm() {
             className="rounded-full"
           />
         </div>
-        <h1 className="text-4xl font-bold text-white">
-          Welcome to EduRepublic
+
+        <h1 className="text-3xl font-bold text-white">
+          Welcome to Brightlight School
         </h1>
         <p className="text-md text-white max-w-md mx-auto">
-          Ready to join our team? Let's start your application journey.
+          Ready to join our educational team? Let's start your application
+          journey.
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-          <div className="p-4 rounded-lg bg-white/5 border border-shamrock-50">
-            <User className="w-8 h-8 text-shamrock-300 mx-auto mb-2" />
+          <div className="p-4 rounded-lg bg-white/5 border border-picton-blue-50">
+            <User className="w-8 h-8 text-picton-blue-300 mx-auto mb-2" />
             <h3 className="font-semibold text-white mb-1">Personal Info</h3>
             <p className="text-sm text-gray-300">Tell us about yourself</p>
           </div>
 
           <div className="p-4 rounded-lg bg-white/20 border border-slate-50">
-            <Briefcase className="w-8 h-8 text-shamrock-300 mx-auto mb-2" />
+            <Briefcase className="w-8 h-8 text-picton-blue-300 mx-auto mb-2" />
             <h3 className="font-semibold text-white mb-1">Role Selection</h3>
             <p className="text-sm text-gray-300">Choose your position</p>
           </div>
+
           <div className="p-4 rounded-lg bg-white/5 border border-slate-50">
-            <FileText className="w-8 h-8 text-shamrock-300 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">Experience</h3>
-            <p className="text-sm text-gray-300">Share your background</p>
+            <FileText className="w-8 h-8 text-picton-blue-300 mx-auto mb-2" />
+            <h3 className="font-semibold text-white mb-1">Documents</h3>
+            <p className="text-sm text-gray-300">Share your credentials</p>
           </div>
         </div>
 
         <div className="space-y-2">
-          <p className="text-gray-200">
+          <p className="text-gray-100">
             This will take approximately 5-10 minutes
           </p>
           <p className="text-sm text-gray-300">
@@ -310,15 +384,13 @@ export default function JobApplicationForm() {
       className="space-y-6"
     >
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          Let's get to know you
-        </h2>
-        <p className="text-gray-300">Tell us about yourself to get started</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Section 1 of 5</h2>
+        <p className="text-gray-300">Personal Information & Position</p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="fullName" className="text-gray-200 font-medium">
+          <Label htmlFor="fullName" className="text-gray-100 font-medium">
             Full Name *
           </Label>
           <Input
@@ -327,7 +399,7 @@ export default function JobApplicationForm() {
             onChange={(e) => updateFormData("fullName", e.target.value)}
             className={`mt-1 ${
               errors.fullName ? "border-red-500" : "border-gray-400"
-            } focus:border-shamrock-300 focus:ring-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
+            } focus:border-picton-blue-300 focus:ring-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
             placeholder="Enter your full name"
           />
           {errors.fullName && (
@@ -336,7 +408,7 @@ export default function JobApplicationForm() {
         </div>
 
         <div>
-          <Label htmlFor="email" className="text-gray-200 font-medium">
+          <Label htmlFor="email" className="text-gray-100 font-medium">
             Email Address *
           </Label>
           <Input
@@ -346,7 +418,7 @@ export default function JobApplicationForm() {
             onChange={(e) => updateFormData("email", e.target.value)}
             className={`mt-1 ${
               errors.email ? "border-red-500" : "border-gray-400"
-            } focus:border-shamrock-300 focus:ring-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
+            } focus:border-picton-blue-300 focus:ring-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
             placeholder="your.email@example.com"
           />
           {errors.email && (
@@ -355,7 +427,7 @@ export default function JobApplicationForm() {
         </div>
 
         <div>
-          <Label htmlFor="phone" className="text-gray-200 font-medium">
+          <Label htmlFor="phone" className="text-gray-100 font-medium">
             Phone Number *
           </Label>
           <Input
@@ -365,66 +437,108 @@ export default function JobApplicationForm() {
             onChange={(e) => updateFormData("phone", e.target.value)}
             className={`mt-1 ${
               errors.phone ? "border-red-500" : "border-gray-400"
-            } focus:border-shamrock-300 focus:ring-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-            placeholder="+1234567890"
+            } focus:border-picton-blue-300 focus:ring-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+            placeholder="Enter your phone number"
           />
           {errors.phone && (
             <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
           )}
-          <p className="text-sm text-gray-400 mt-1">
-            Include country code (e.g., +1 for US)
-          </p>
+        </div>
+
+        <div>
+          <Label className="text-gray-100 font-medium">
+            Highest Level of Education *
+          </Label>
+          <Select
+            value={formData.education}
+            onValueChange={(value) => updateFormData("education", value)}
+          >
+            <SelectTrigger
+              className={`mt-1 ${
+                errors.education ? "border-red-500" : "border-gray-400"
+              } focus:border-picton-blue-300 focus:ring-picton-blue-300 bg-white/10 text-white`}
+            >
+              <SelectValue placeholder="Select education level" />
+            </SelectTrigger>
+            <SelectContent>
+              {educationLevels.map((level) => (
+                <SelectItem key={level} value={level}>
+                  {level}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.education && (
+            <p className="text-red-400 text-sm mt-1">{errors.education}</p>
+          )}
+        </div>
+
+        <div>
+          <Label htmlFor="fieldOfStudy" className="text-gray-100 font-medium">
+            Field of Study *
+          </Label>
+          <Input
+            id="fieldOfStudy"
+            value={formData.fieldOfStudy}
+            onChange={(e) => updateFormData("fieldOfStudy", e.target.value)}
+            className={`mt-1 ${
+              errors.fieldOfStudy ? "border-red-500" : "border-gray-400"
+            } focus:border-picton-blue-300 focus:ring-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+            placeholder="e.g., Education, Mathematics, English"
+          />
+          {errors.fieldOfStudy && (
+            <p className="text-red-400 text-sm mt-1">{errors.fieldOfStudy}</p>
+          )}
+        </div>
+
+        <div>
+          <Label className="text-gray-100 font-medium">
+            What Position are you applying for? *
+          </Label>
+          <Select
+            value={formData.position}
+            onValueChange={(value) => updateFormData("position", value)}
+          >
+            <SelectTrigger
+              className={`mt-1 ${
+                errors.position ? "border-red-500" : "border-gray-400"
+              } focus:border-picton-blue-300 focus:ring-picton-blue-300 bg-white/10 text-white`}
+            >
+              <SelectValue placeholder="Choose a position" />
+            </SelectTrigger>
+            <SelectContent>
+              {positions.map((position) => (
+                <SelectItem key={position} value={position}>
+                  {position}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.position && (
+            <p className="text-red-400 text-sm mt-1">{errors.position}</p>
+          )}
         </div>
       </div>
     </motion.div>
   );
 
-  const renderStep2 = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="space-y-6"
-    >
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          What role interests you?
-        </h2>
-        <p className="text-gray-300">
-          Select the position you'd like to apply for
-        </p>
-      </div>
+  const renderStep2 = () => {
+    if (!formData.position) return null;
 
-      <div>
-        <Label className="text-gray-200 font-medium">Select Role *</Label>
-        <Select
-          value={formData.role}
-          onValueChange={(value) => updateFormData("role", value)}
-        >
-          <SelectTrigger
-            className={`mt-1 ${
-              errors.role ? "border-red-500" : "border-gray-400"
-            } focus:border-shamrock-300 focus:ring-shamrock-300 bg-white/10 text-white`}
-          >
-            <SelectValue placeholder="Choose a role" />
-          </SelectTrigger>
-          <SelectContent>
-            {roles.map((role) => (
-              <SelectItem key={role} value={role}>
-                {role}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.role && (
-          <p className="text-red-400 text-sm mt-1">{errors.role}</p>
-        )}
-      </div>
-    </motion.div>
-  );
-
-  const renderStep3 = () => {
-    if (!formData.role) return null;
+    const getSectionNumber = () => {
+      switch (formData.position) {
+        case "School Teacher":
+          return "Section 2 of 5";
+        case "Bus Assistant":
+          return "Section 3 of 5";
+        case "School Cleaner":
+          return "Section 4 of 5";
+        case "Child Minder":
+          return "Section 5 of 5";
+        default:
+          return "Section 2 of 5";
+      }
+    };
 
     return (
       <motion.div
@@ -435,210 +549,54 @@ export default function JobApplicationForm() {
       >
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-white mb-2">
-            Tell us about your experience
+            {getSectionNumber()}
           </h2>
-          <p className="text-gray-300">
-            Role-specific questions for {formData.role}
-          </p>
+          <p className="text-gray-300">{formData.position} Questions</p>
         </div>
 
-        {formData.role === "Social Media Manager" && (
-          <div className="space-y-4">
+        {(formData.position === "School Teacher" || formData.position === "Assistant School Teacher") && (
+                    <div className="space-y-4">
             <div>
-              <Label className="text-gray-200 font-medium">
-                How long have you managed social media accounts? *
-              </Label>
-              <Input
-                value={formData.socialMediaExperience || ""}
-                onChange={(e) =>
-                  updateFormData("socialMediaExperience", e.target.value)
-                }
-                className={`mt-1 ${
-                  errors.socialMediaExperience
-                    ? "border-red-500"
-                    : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="e.g., 2 years"
-              />
-              {errors.socialMediaExperience && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.socialMediaExperience}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-              Upload links to a portfolio or social media handles you've managed? *              </Label>
-              <Input
-                value={formData.portfolioLink || ""}
-                onChange={(e) =>
-                  updateFormData("portfolioLink", e.target.value)
-                }
-                className={`mt-1 ${
-                  errors.portfolioLink ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="https://your-portfolio.com"
-              />
-              {errors.portfolioLink && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.portfolioLink}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-                Which social media tools are you familiar with? *
-              </Label>
-              <Input
-                value={formData.socialMediaTools || ""}
-                onChange={(e) =>
-                  updateFormData("socialMediaTools", e.target.value)
-                }
-                className={`mt-1 ${
-                  errors.socialMediaTools ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="e.g., Hootsuite, Buffer, Canva"
-              />
-              {errors.socialMediaTools && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.socialMediaTools}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-                Can you create content, film & edit videos? *
+              <Label className="text-gray-100 font-medium">
+                Do you have a valid teaching qualification or certification? *
               </Label>
               <RadioGroup
-                value={formData.contentCreation || ""}
+                value={formData.teachingQualification || ""}
                 onValueChange={(value) =>
-                  updateFormData("contentCreation", value)
+                  updateFormData("teachingQualification", value)
                 }
                 className="mt-2"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="yes" id="content-yes" />
-                  <Label htmlFor="content-yes" className="text-gray-200">
+                  <RadioGroupItem value="yes" id="qual-yes" />
+                  <Label htmlFor="qual-yes" className="text-gray-300 font-light">
                     Yes
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="content-no" />
-                  <Label htmlFor="content-no" className="text-gray-200">
+                  <RadioGroupItem value="no" id="qual-no" />
+                  <Label htmlFor="qual-no" className="text-gray-300 font-light">
                     No
                   </Label>
                 </div>
               </RadioGroup>
-              {errors.contentCreation && (
+              {errors.teachingQualification && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.contentCreation}
+                  {errors.teachingQualification}
                 </p>
               )}
             </div>
 
             <div>
-              <Label className="text-gray-200 font-medium">
-              Are you familiar with email marketing? list the tools you are familiar with *
-              </Label>
-              <Input
-                value={formData.emailMarketing || ""}
-                onChange={(e) =>
-                  updateFormData("emailMarketing", e.target.value)
-                }
-                className={`mt-1 ${
-                  errors.emailMarketing ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="e.g., Mailchimp, ConvertKit"
-              />
-              {errors.emailMarketing && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.emailMarketing}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-                Do you live at Ajah, Ado, Badore or it's environs? *
-              </Label>
-              <RadioGroup
-                value={formData.livesInArea || ""}
-                onValueChange={(value) => updateFormData("livesInArea", value)}
-                className="mt-2"
+              <Label
+                htmlFor="teachingExperience"
+                className="text-gray-100 font-medium"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="yes" id="area-yes" />
-                  <Label htmlFor="area-yes" className="text-gray-200">
-                    Yes
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="area-no" />
-                  <Label htmlFor="area-no" className="text-gray-200">
-                    No
-                  </Label>
-                </div>
-              </RadioGroup>
-              {errors.livesInArea && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.livesInArea}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-                Share your social media pages *
-              </Label>
-              <Textarea
-                value={formData.socialMediaPages || ""}
-                onChange={(e) =>
-                  updateFormData("socialMediaPages", e.target.value)
-                }
-                className={`mt-1 ${
-                  errors.socialMediaPages ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="List your social media handles"
-                rows={3}
-              />
-              {errors.socialMediaPages && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.socialMediaPages}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {formData.role === "IT Tutor" && (
-          <div className="space-y-4">
-            <div>
-              <Label className="text-gray-200 font-medium">
-              What are your areas of expertise in IT? *
+                How many years of teaching experience do you have at the primary
+                level? *
               </Label>
               <Input
-                value={formData.itExpertise || ""}
-                onChange={(e) => updateFormData("itExpertise", e.target.value)}
-                className={`mt-1 ${
-                  errors.itExpertise ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="e.g., Web Development, Data Analysis, Javascript"
-              />
-              {errors.itExpertise && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.itExpertise}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-              Describe your experience in teaching or tutoring IT subjects. What age groups or skill levels have you worked with? *
-              </Label>
-              <Textarea
+                id="teachingExperience"
                 value={formData.teachingExperience || ""}
                 onChange={(e) =>
                   updateFormData("teachingExperience", e.target.value)
@@ -647,9 +605,8 @@ export default function JobApplicationForm() {
                   errors.teachingExperience
                     ? "border-red-500"
                     : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="Describe your teaching experience"
-                rows={4}
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., 3 years"
               />
               {errors.teachingExperience && (
                 <p className="text-red-400 text-sm mt-1">
@@ -658,182 +615,523 @@ export default function JobApplicationForm() {
               )}
             </div>
 
-            <div>
-              <Label className="text-gray-200 font-medium">
-              How do you approach explaining a complex technical concept to a beginner? Provide an example. *
+            <div className="mt-12">
+              <Label className="text-gray-100 font-medium">
+                Which subjects are you most comfortable teaching? (Select all
+                that apply) *
+              </Label>
+
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {subjects.map((subject) => (
+                  <div key={subject} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`subject-${subject}`}
+                      checked={formData.subjects?.includes(subject) || false}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange(
+                          "subjects",
+                          subject,
+                          checked as boolean
+                        )
+                      }
+                    />
+                    <Label
+                      htmlFor={`subject-${subject}`}
+                      className="text-gray-300 font-light"
+                    >
+                      {subject}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+
+              {errors.subjects && (
+                <p className="text-red-400 text-sm mt-1">{errors.subjects}</p>
+              )}
+            </div>
+
+            <div className="mt-12">
+              <Label className="text-gray-100 font-medium">
+                Which grade levels are you most confident teaching? (Select all
+                that apply) *
+              </Label>
+              <div className="mt-2 space-y-2">
+                {gradeLevels.map((level) => (
+                  <div key={level} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`grade-${level}`}
+                      checked={formData.gradeLevels?.includes(level) || false}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange(
+                          "gradeLevels",
+                          level,
+                          checked as boolean
+                        )
+                      }
+                    />
+                    <Label
+                      htmlFor={`grade-${level}`}
+                      className="text-gray-300 font-light"
+                    >
+                      {level}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {errors.gradeLevels && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.gradeLevels}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-12">
+              <Label className="text-gray-100 font-medium">
+                Have you previously worked with a specific curriculum? If yes,
+                which one? *
+              </Label>
+              <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                {curriculumOptions.map((curriculum) => (
+                  <div key={curriculum} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`curriculum-${curriculum}`}
+                      checked={
+                        formData.curriculum?.includes(curriculum) || false
+                      }
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange(
+                          "curriculum",
+                          curriculum,
+                          checked as boolean
+                        )
+                      }
+                    />
+                    <Label
+                      htmlFor={`curriculum-${curriculum}`}
+                      className="text-gray-300 font-light"
+                    >
+                      {curriculum}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {errors.curriculum && (
+                <p className="text-red-400 text-sm mt-1">{errors.curriculum}</p>
+              )}
+            </div>
+
+            <div className="mt-12">
+              <Label
+                htmlFor="classroomManagement"
+                className="text-gray-100 font-medium"
+              >
+                Describe one classroom management strategy you use effectively.
+                *
               </Label>
               <Textarea
-                value={formData.explainConcepts || ""}
+                id="classroomManagement"
+                value={formData.classroomManagement || ""}
                 onChange={(e) =>
-                  updateFormData("explainConcepts", e.target.value)
+                  updateFormData("classroomManagement", e.target.value)
                 }
                 className={`mt-1 ${
-                  errors.explainConcepts ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="Describe your teaching methodology"
-                rows={4}
+                  errors.classroomManagement
+                    ? "border-red-500"
+                    : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe your classroom management strategy"
+                rows={3}
               />
-              {errors.explainConcepts && (
+              {errors.classroomManagement && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.explainConcepts}
+                  {errors.classroomManagement}
                 </p>
               )}
             </div>
 
-            <div>
-              <Label className="text-gray-200 font-medium">
-              Which Learning Management Systems (LMS) or online teaching platforms are you familiar with? *
+            <div className="mt-12">
+              <Label
+                htmlFor="engageStudents"
+                className="text-gray-100 font-medium"
+              >
+                How do you engage young learners and maintain their attention
+                during lessons? *
               </Label>
-              <Input
-                value={formData.lmsPlatforms || ""}
-                onChange={(e) => updateFormData("lmsPlatforms", e.target.value)}
+              <Textarea
+                id="engageStudents"
+                value={formData.engageStudents || ""}
+                onChange={(e) =>
+                  updateFormData("engageStudents", e.target.value)
+                }
                 className={`mt-1 ${
-                  errors.lmsPlatforms ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="e.g., Moodle, Canvas, Blackboard"
+                  errors.engageStudents ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe how you engage young learners"
+                rows={3}
               />
-              {errors.lmsPlatforms && (
+              {errors.engageStudents && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.lmsPlatforms}
+                  {errors.engageStudents}
                 </p>
               )}
             </div>
 
-            <div>
-              <Label className="text-gray-200 font-medium">
-              Please provide a link to a portfolio of any teaching materials, tutorials, or projects you have created. *
+            <div className="mt-12">
+              <Label className="text-gray-100 font-medium">
+                Are you experienced in preparing lesson plans and assessments? *
+              </Label>
+              <RadioGroup
+                value={formData.lessonPlans || ""}
+                onValueChange={(value) => updateFormData("lessonPlans", value)}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="lesson-yes" />
+                  <Label htmlFor="lesson-yes" className="text-gray-300 font-light">
+                    Yes
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="lesson-no" />
+                  <Label htmlFor="lesson-no" className="text-gray-300 font-light">
+                    No
+                  </Label>
+                </div>
+              </RadioGroup>
+              {errors.lessonPlans && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.lessonPlans}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-12">
+              <Label
+                htmlFor="availability"
+                className="text-gray-100 font-medium"
+              >
+                Are you available for immediate employment or do you require
+                notice? *
               </Label>
               <Input
-                value={formData.itPortfolioLink || ""}
-                onChange={(e) =>
-                  updateFormData("itPortfolioLink", e.target.value)
-                }
+                id="availability"
+                value={formData.availability || ""}
+                onChange={(e) => updateFormData("availability", e.target.value)}
                 className={`mt-1 ${
-                  errors.itPortfolioLink ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="https://your-portfolio.com"
+                  errors.availability ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Available immediately / 2 weeks notice required"
               />
-              {errors.itPortfolioLink && (
+              {errors.availability && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.itPortfolioLink}
+                  {errors.availability}
                 </p>
               )}
             </div>
           </div>
         )}
 
-        {formData.role === "Curriculum Designer" && (
+        {formData.position === "Bus Assistant" && (
           <div className="space-y-4">
             <div>
-              <Label className="text-gray-200 font-medium">
-              Describe your experience in curriculum design and instructional design. Which instructional design models are you familiar with ? *
+              <Label
+                htmlFor="busAssistantRole"
+                className="text-gray-100 font-medium"
+              >
+                What do you understand to be the role of a school bus assistant?
+                *
               </Label>
               <Textarea
-                value={formData.curriculumExperience || ""}
+                id="busAssistantRole"
+                value={formData.busAssistantRole || ""}
                 onChange={(e) =>
-                  updateFormData("curriculumExperience", e.target.value)
+                  updateFormData("busAssistantRole", e.target.value)
                 }
                 className={`mt-1 ${
-                  errors.curriculumExperience
-                    ? "border-red-500"
-                    : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="Describe your curriculum design experience"
+                  errors.busAssistantRole ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe your understanding of the bus assistant role"
                 rows={4}
               />
-              {errors.curriculumExperience && (
+              {errors.busAssistantRole && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.curriculumExperience}
+                  {errors.busAssistantRole}
                 </p>
               )}
             </div>
 
             <div>
-              <Label className="text-gray-200 font-medium">
-              What is your process for conducting a needs analysis to determine learning objectives? *
+              <Label
+                htmlFor="childExperience"
+                className="text-gray-100 font-medium"
+              >
+                Do you have experience working with children or in a school
+                environment? *
               </Label>
               <Textarea
-                value={formData.needsAnalysis || ""}
+                id="childExperience"
+                value={formData.childExperience || ""}
                 onChange={(e) =>
-                  updateFormData("needsAnalysis", e.target.value)
+                  updateFormData("childExperience", e.target.value)
                 }
                 className={`mt-1 ${
-                  errors.needsAnalysis ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="Describe your needs analysis process"
-                rows={4}
+                  errors.childExperience ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe your experience with children"
+                rows={3}
               />
-              {errors.needsAnalysis && (
+              {errors.childExperience && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.needsAnalysis}
+                  {errors.childExperience}
                 </p>
               )}
             </div>
 
             <div>
-              <Label className="text-gray-200 font-medium">
-              Please provide a link to a portfolio of curriculum or learning materials you have designed. *
+              <Label
+                htmlFor="morningAfternoonAvailable"
+                className="text-gray-100 font-medium"
+              >
+                Are you available early in the morning and in the afternoons for
+                school runs? *
               </Label>
               <Input
-                value={formData.curriculumPortfolioLink || ""}
+                id="morningAfternoonAvailable"
+                value={formData.morningAfternoonAvailable || ""}
                 onChange={(e) =>
-                  updateFormData("curriculumPortfolioLink", e.target.value)
+                  updateFormData("morningAfternoonAvailable", e.target.value)
                 }
                 className={`mt-1 ${
-                  errors.curriculumPortfolioLink
+                  errors.morningAfternoonAvailable
                     ? "border-red-500"
                     : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="https://your-portfolio.com"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Yes, available 6:30 AM - 8:30 AM and 2:00 PM - 4:00 PM"
               />
-              {errors.curriculumPortfolioLink && (
+              {errors.morningAfternoonAvailable && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.curriculumPortfolioLink}
+                  {errors.morningAfternoonAvailable}
                 </p>
               )}
             </div>
 
             <div>
-              <Label className="text-gray-200 font-medium">
-              Which e-learning authoring tools and multimedia development software are you proficient in? *
-              </Label>
-              <Input
-                value={formData.toolsProficiency || ""}
-                onChange={(e) =>
-                  updateFormData("toolsProficiency", e.target.value)
-                }
-                className={`mt-1 ${
-                  errors.toolsProficiency ? "border-red-500" : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="e.g., Articulate Storyline, Adobe Captivate"
-              />
-              {errors.toolsProficiency && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.toolsProficiency}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-gray-200 font-medium">
-              How do you evaluate the effectiveness of a curriculum and measure learning outcomes? *
+              <Label
+                htmlFor="childSafety"
+                className="text-gray-100 font-medium"
+              >
+                How do you make sure children are safely seated and behaving
+                well during the ride? *
               </Label>
               <Textarea
-                value={formData.evaluateEffectiveness || ""}
-                onChange={(e) =>
-                  updateFormData("evaluateEffectiveness", e.target.value)
-                }
+                id="childSafety"
+                value={formData.childSafety || ""}
+                onChange={(e) => updateFormData("childSafety", e.target.value)}
                 className={`mt-1 ${
-                  errors.evaluateEffectiveness
-                    ? "border-red-500"
-                    : "border-gray-400"
-                } focus:border-shamrock-300 bg-white/10 text-white placeholder:text-gray-300`}
-                placeholder="Describe your evaluation methods"
+                  errors.childSafety ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe your approach to ensuring child safety and good behavior"
                 rows={4}
               />
-              {errors.evaluateEffectiveness && (
+              {errors.childSafety && (
                 <p className="text-red-400 text-sm mt-1">
-                  {errors.evaluateEffectiveness}
+                  {errors.childSafety}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {formData.position === "School Cleaner" && (
+          <div className="space-y-4">
+            <div>
+              <Label
+                htmlFor="schoolEnvironmentExperience"
+                className="text-gray-100 font-medium"
+              >
+                Have you worked in a school or child-focused environment before?
+                *
+              </Label>
+              <Input
+                id="schoolEnvironmentExperience"
+                value={formData.schoolEnvironmentExperience || ""}
+                onChange={(e) =>
+                  updateFormData("schoolEnvironmentExperience", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.schoolEnvironmentExperience
+                    ? "border-red-500"
+                    : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Yes, worked at ABC Primary School for 2 years"
+              />
+              {errors.schoolEnvironmentExperience && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.schoolEnvironmentExperience}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="livesNearSchool"
+                className="text-gray-100 font-medium"
+              >
+                Do you live close to the school (Ajah/Badore area)? *
+              </Label>
+              <Input
+                id="livesNearSchool"
+                value={formData.livesNearSchool || ""}
+                onChange={(e) =>
+                  updateFormData("livesNearSchool", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.livesNearSchool ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Yes, I live in Ajah"
+              />
+              {errors.livesNearSchool && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.livesNearSchool}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="startAvailability"
+                className="text-gray-100 font-medium"
+              >
+                How soon are you available to start? *
+              </Label>
+              <Input
+                id="startAvailability"
+                value={formData.startAvailability || ""}
+                onChange={(e) =>
+                  updateFormData("startAvailability", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.startAvailability
+                    ? "border-red-500"
+                    : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Immediately / 1 week notice"
+              />
+              {errors.startAvailability && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.startAvailability}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {formData.position === "Child Minder" && (
+          <div className="space-y-4">
+            <div>
+              <Label
+                htmlFor="childMindingExperience"
+                className="text-gray-100 font-medium"
+              >
+                Can you tell me about your previous experience working with
+                children? *
+              </Label>
+              <Textarea
+                id="childMindingExperience"
+                value={formData.childMindingExperience || ""}
+                onChange={(e) =>
+                  updateFormData("childMindingExperience", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.childMindingExperience
+                    ? "border-red-500"
+                    : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe your experience working with children"
+                rows={4}
+              />
+              {errors.childMindingExperience && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.childMindingExperience}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="outdoorSafety"
+                className="text-gray-100 font-medium"
+              >
+                How do you ensure the safety of children when they are playing
+                outside? *
+              </Label>
+              <Textarea
+                id="outdoorSafety"
+                value={formData.outdoorSafety || ""}
+                onChange={(e) =>
+                  updateFormData("outdoorSafety", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.outdoorSafety ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="Describe your approach to outdoor safety"
+                rows={4}
+              />
+              {errors.outdoorSafety && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.outdoorSafety}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="workWithTeacher"
+                className="text-gray-100 font-medium"
+              >
+                Can you work alongside a teacher or assistant in a classroom
+                setting? *
+              </Label>
+              <Input
+                id="workWithTeacher"
+                value={formData.workWithTeacher || ""}
+                onChange={(e) =>
+                  updateFormData("workWithTeacher", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.workWithTeacher ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Yes, I work well in team environments"
+              />
+              {errors.workWithTeacher && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.workWithTeacher}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="multipleChildren"
+                className="text-gray-100 font-medium"
+              >
+                Are you comfortable working with more than one child at a time?
+                *
+              </Label>
+              <Input
+                id="multipleChildren"
+                value={formData.multipleChildren || ""}
+                onChange={(e) =>
+                  updateFormData("multipleChildren", e.target.value)
+                }
+                className={`mt-1 ${
+                  errors.multipleChildren ? "border-red-500" : "border-gray-400"
+                } focus:border-picton-blue-300 bg-white/10 text-white placeholder:text-gray-300`}
+                placeholder="e.g., Yes, I can manage groups of up to 10 children"
+              />
+              {errors.multipleChildren && (
+                <p className="text-red-400 text-sm mt-1">
+                  {errors.multipleChildren}
                 </p>
               )}
             </div>
@@ -843,7 +1141,7 @@ export default function JobApplicationForm() {
     );
   };
 
-  const renderStep4 = () => (
+  const renderStep3 = () => (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -855,18 +1153,20 @@ export default function JobApplicationForm() {
           Upload your documents
         </h2>
         <p className="text-gray-300">
-          Please upload your cover letter and resume
+          Please upload your cover letter and CV/Resume
         </p>
       </div>
 
       <div className="space-y-6">
         <div>
-          <Label className="text-gray-200 font-medium">Cover Letter *</Label>
+          <Label className="text-gray-100 font-medium">
+            Kindly upload your cover letter in PDF or Word format *
+          </Label>
           <div
             className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               errors.coverLetter
                 ? "border-red-400 bg-red-900/20"
-                : "border-gray-400 hover:border-shamrock-300 hover:bg-shamrock-900/20"
+                : "border-gray-400 hover:border-picton-blue-300 hover:bg-picton-blue-900/20"
             }`}
           >
             <input
@@ -878,8 +1178,8 @@ export default function JobApplicationForm() {
               }
               className="hidden"
             />
-            <Upload className="mx-auto h-12 w-12 text-gray-200 mb-4" />
-            <p className="text-gray-200 mb-2">
+            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-gray-300 mb-2">
               {formData.coverLetter
                 ? formData.coverLetter.name
                 : "Click to upload cover letter"}
@@ -888,11 +1188,11 @@ export default function JobApplicationForm() {
               type="button"
               variant="outline"
               onClick={() => fileInputRefs.current["coverLetter"]?.click()}
-              className="border-shamrock-300 text-shamrock-300 hover:bg-shamrock-900/20 bg-transparent"
+              className="border-picton-blue-300 text-picton-blue-300 hover:bg-picton-blue-900/20 bg-transparent"
             >
               {formData.coverLetter ? "Change File" : "Choose File"}
             </Button>
-            <p className="text-sm text-gray-300 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               PDF, DOC, or DOCX (max 10MB)
             </p>
           </div>
@@ -902,12 +1202,14 @@ export default function JobApplicationForm() {
         </div>
 
         <div>
-          <Label className="text-gray-200 font-medium">Resume/CV *</Label>
+          <Label className="text-gray-100 font-medium">
+            Kindly upload your CV/Resume in PDF or Word format *
+          </Label>
           <div
             className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               errors.resume
                 ? "border-red-400 bg-red-900/20"
-                : "border-gray-400 hover:border-shamrock-300 hover:bg-shamrock-900/20"
+                : "border-gray-400 hover:border-picton-blue-300 hover:bg-picton-blue-900/20"
             }`}
           >
             <input
@@ -919,21 +1221,21 @@ export default function JobApplicationForm() {
               }
               className="hidden"
             />
-            <Upload className="mx-auto h-12 w-12 text-gray-200 mb-4" />
-            <p className="text-gray-200 mb-2">
+            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <p className="text-gray-300 mb-2">
               {formData.resume
                 ? formData.resume.name
-                : "Click to upload resume"}
+                : "Click to upload CV/Resume"}
             </p>
             <Button
               type="button"
               variant="outline"
               onClick={() => fileInputRefs.current["resume"]?.click()}
-              className="border-shamrock-300 text-shamrock-300 hover:bg-shamrock-900/20 bg-transparent"
+              className="border-picton-blue-300 text-picton-blue-300 hover:bg-picton-blue-900/20 bg-transparent"
             >
               {formData.resume ? "Change File" : "Choose File"}
             </Button>
-            <p className="text-sm text-gray-300 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               PDF, DOC, or DOCX (max 10MB)
             </p>
           </div>
@@ -964,7 +1266,7 @@ export default function JobApplicationForm() {
       <div className="space-y-6">
         {/* Personal Information */}
         <div className="bg-white/5 rounded-lg p-4 border border-gray-400">
-          <h3 className="text-lg font-semibold text-shamrock-300 mb-3">
+          <h3 className="text-lg font-semibold text-picton-blue-300 mb-3">
             Personal Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -981,95 +1283,130 @@ export default function JobApplicationForm() {
               <p className="text-white font-medium">{formData.phone}</p>
             </div>
             <div>
-              <span className="text-gray-400">Role:</span>
-              <p className="text-white font-medium">{formData.role}</p>
+              <span className="text-gray-400">Education:</span>
+              <p className="text-white font-medium">{formData.education}</p>
+            </div>
+            <div>
+              <span className="text-gray-400">Field of Study:</span>
+              <p className="text-white font-medium">{formData.fieldOfStudy}</p>
+            </div>
+            <div>
+              <span className="text-gray-400">Position:</span>
+              <p className="text-white font-medium">{formData.position}</p>
             </div>
           </div>
         </div>
 
-        {/* Role-specific Information */}
+        {/* Position-specific Information */}
         <div className="bg-white/5 rounded-lg p-4 border border-gray-400">
-          <h3 className="text-lg font-semibold text-shamrock-300 mb-3">
-            Experience & Qualifications
+          <h3 className="text-lg font-semibold text-picton-blue-300 mb-3">
+            Position-Specific Responses
           </h3>
           <div className="space-y-3 text-sm">
-            {formData.role === "Social Media Manager" && (
+            {formData.position === "School Teacher" && (
               <>
                 <div>
-                  <span className="text-gray-400">Experience:</span>
-                  <p className="text-white">{formData.socialMediaExperience}</p>
+                  <span className="text-gray-400">Teaching Qualification:</span>
+                  <p className="text-white">{formData.teachingQualification}</p>
                 </div>
-                <div>
-                  <span className="text-gray-400">Portfolio:</span>
-                  <p className="text-white break-all">
-                    {formData.portfolioLink}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Tools:</span>
-                  <p className="text-white">{formData.socialMediaTools}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Content Creation:</span>
-                  <p className="text-white">{formData.contentCreation}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Email Marketing:</span>
-                  <p className="text-white">{formData.emailMarketing}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Lives in Area:</span>
-                  <p className="text-white">{formData.livesInArea}</p>
-                </div>
-              </>
-            )}
-
-            {formData.role === "IT Tutor" && (
-              <>
-                <div>
-                  <span className="text-gray-400">IT Expertise:</span>
-                  <p className="text-white">{formData.itExpertise}</p>
-                </div>
-
                 <div>
                   <span className="text-gray-400">Teaching Experience:</span>
                   <p className="text-white">{formData.teachingExperience}</p>
                 </div>
-
                 <div>
-                  <span className="text-gray-400">Explain Concepts:</span>
-                  <p className="text-white">{formData.explainConcepts}</p>
+                  <span className="text-gray-400">Subjects:</span>
+                  <p className="text-white">{formData.subjects?.join(", ")}</p>
                 </div>
-
                 <div>
-                  <span className="text-gray-400">LMS Platforms:</span>
-                  <p className="text-white">{formData.lmsPlatforms}</p>
+                  <span className="text-gray-400">Grade Levels:</span>
+                  <p className="text-white">
+                    {formData.gradeLevels?.join(", ")}
+                  </p>
                 </div>
-
                 <div>
-                  <span className="text-gray-400">Portfolio:</span>
-                  <p className="text-white break-all">
-                    {formData.itPortfolioLink}
+                  <span className="text-gray-400">Curriculum Experience:</span>
+                  <p className="text-white">
+                    {formData.curriculum?.join(", ")}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-gray-400">
+                    Lesson Plans Experience:
+                  </span>
+                  <p className="text-white">{formData.lessonPlans}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Availability:</span>
+                  <p className="text-white">{formData.availability}</p>
+                </div>
+              </>
+            )}
+
+            {formData.position === "Bus Assistant" && (
+              <>
+                <div>
+                  <span className="text-gray-400">Understanding of Role:</span>
+                  <p className="text-white">{formData.busAssistantRole}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Child Experience:</span>
+                  <p className="text-white">{formData.childExperience}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">
+                    Morning/Afternoon Availability:
+                  </span>
+                  <p className="text-white">
+                    {formData.morningAfternoonAvailable}
                   </p>
                 </div>
               </>
             )}
 
-            {formData.role === "Curriculum Designer" && (
+            {formData.position === "School Cleaner" && (
               <>
                 <div>
-                  <span className="text-gray-400">Curriculum Experience:</span>
-                  <p className="text-white">{formData.curriculumExperience}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Tools Proficiency:</span>
-                  <p className="text-white">{formData.toolsProficiency}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Portfolio:</span>
-                  <p className="text-white break-all">
-                    {formData.curriculumPortfolioLink}
+                  <span className="text-gray-400">
+                    School Environment Experience:
+                  </span>
+                  <p className="text-white">
+                    {formData.schoolEnvironmentExperience}
                   </p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Lives Near School:</span>
+                  <p className="text-white">{formData.livesNearSchool}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Start Availability:</span>
+                  <p className="text-white">{formData.startAvailability}</p>
+                </div>
+              </>
+            )}
+
+            {formData.position === "Child Minder" && (
+              <>
+                <div>
+                  <span className="text-gray-400">
+                    Child Minding Experience:
+                  </span>
+                  <p className="text-white">
+                    {formData.childMindingExperience}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-gray-400">
+                    Outdoor Safety Approach:
+                  </span>
+                  <p className="text-white">{formData.outdoorSafety}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Work with Teacher:</span>
+                  <p className="text-white">{formData.workWithTeacher}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Multiple Children:</span>
+                  <p className="text-white">{formData.multipleChildren}</p>
                 </div>
               </>
             )}
@@ -1078,7 +1415,7 @@ export default function JobApplicationForm() {
 
         {/* Uploaded Documents */}
         <div className="bg-white/5 rounded-lg p-4 border border-gray-400">
-          <h3 className="text-lg font-semibold text-shamrock-300 mb-3">
+          <h3 className="text-lg font-semibold text-picton-blue-300 mb-3">
             Uploaded Documents
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -1089,15 +1426,15 @@ export default function JobApplicationForm() {
               </p>
             </div>
             <div>
-              <span className="text-gray-400">Resume:</span>
+              <span className="text-gray-400">CV/Resume:</span>
               <p className="text-white font-medium">{formData.resume?.name}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-shamrock-900/20 border border-shamrock-300/30 rounded-lg p-4">
-        <p className="text-shamrock-200 text-sm">
+      <div className="bg-picton-blue-900/20 border border-picton-blue-300/30 rounded-lg p-4">
+        <p className="text-picton-blue-200 text-sm">
           By submitting this application, you confirm that all information
           provided is accurate and complete.
         </p>
@@ -1113,45 +1450,47 @@ export default function JobApplicationForm() {
     >
       <div className="space-y-4">
         <div className="flex justify-center">
-          <div className="p-6 rounded-full bg-shamrock-300/20 border border-shamrock-300/30">
-            <PartyPopper className="w-16 h-16 text-shamrock-300" />
+          <div className="p-6 rounded-full bg-picton-blue-300/20 border border-picton-blue-300/30">
+            <PartyPopper className="w-16 h-16 text-picton-blue-300" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-white">
           Application Submitted!
         </h1>
-        <p className="text-xl text-gray-300 max-w-md mx-auto">
-          Thank you for applying to EduRepublic. We've received your application
-          successfully.
+        <p className="text-lg text-gray-200 max-w-md mx-auto">
+          Thank you for applying to Brightlight School. We've received your
+          application successfully.
         </p>
       </div>
 
       <div className="bg-white/5 rounded-lg p-6 border border-gray-400 max-w-md mx-auto">
-        <h3 className="text-lg font-semibold text-shamrock-300 mb-3">
+        <h3 className="text-lg font-semibold text-picton-blue-300 mb-3">
           What's Next?
         </h3>
-        <div className="space-y-3 text-sm text-gray-300">
+        <div className="space-y-3 text-sm text-gray-100">
           <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-shamrock-300 mt-0.5 flex-shrink-0" />
+            <CheckCircle className="w-5 h-5 text-picton-blue-300 mt-0.5 flex-shrink-0" />
             <p>We'll review your application within 3-5 business days</p>
           </div>
           <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-shamrock-300 mt-0.5 flex-shrink-0" />
+            <CheckCircle className="w-5 h-5 text-picton-blue-300 mt-0.5 flex-shrink-0" />
             <p>You'll receive an email confirmation shortly</p>
           </div>
           <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-shamrock-300 mt-0.5 flex-shrink-0" />
+            <CheckCircle className="w-5 h-5 text-picton-blue-300 mt-0.5 flex-shrink-0" />
             <p>If selected, we'll contact you for an interview</p>
           </div>
         </div>
       </div>
+
+
     </motion.div>
   );
 
   if (isSubmitted) {
     return (
       <div className="max-w-2xl mx-auto py-8">
-        <Card className="backdrop-blur-md bg-white/10 shadow-xl rounded-2xl p-8 border border-gray-400">
+        <Card className="backdrop-blur-md bg-white/20 shadow-xl rounded-2xl p-8 border border-gray-400">
           {renderSuccessScreen()}
         </Card>
       </div>
@@ -1174,9 +1513,9 @@ export default function JobApplicationForm() {
                   <div
                     className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
                       isCompleted
-                        ? "bg-shamrock-300 border-shamrock-300 text-gray-900"
+                        ? "bg-picton-blue-300 border-picton-blue-300 text-gray-900"
                         : isActive
-                        ? "border-shamrock-300 text-shamrock-300 bg-transparent"
+                        ? "border-picton-blue-300 text-picton-blue-300 bg-transparent"
                         : "border-gray-400 text-gray-400 bg-transparent"
                     }`}
                   >
@@ -1190,7 +1529,7 @@ export default function JobApplicationForm() {
                     <div
                       className={`w-16 h-0.5 mx-2 transition-colors duration-300 ${
                         currentStep > step.id
-                          ? "bg-shamrock-300"
+                          ? "bg-picton-blue-300"
                           : "bg-gray-400"
                       }`}
                     />
@@ -1215,8 +1554,7 @@ export default function JobApplicationForm() {
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
-          {currentStep === 4 && renderStep4()}
-          {currentStep === 5 && renderReviewScreen()}
+          {currentStep === 4 && renderReviewScreen()}
         </AnimatePresence>
 
         {/* Navigation Buttons */}
@@ -1226,7 +1564,7 @@ export default function JobApplicationForm() {
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="flex items-center gap-2 border-slate-50 text-gray-200 hover:bg-gray-200/20 disabled:opacity-50 bg-transparent"
+            className="flex items-center gap-2 border-slate-50 text-gray-100 hover:bg-gray-200/20 disabled:opacity-50 bg-transparent"
           >
             <ArrowLeft className="w-4 h-4" />
             Previous
@@ -1236,48 +1574,48 @@ export default function JobApplicationForm() {
             <Button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 bg-shamrock-300 hover:bg-shamrock-400 text-gray-900 border-0 font-medium px-8"
+              className="flex items-center gap-2 bg-cerise-400 hover:bg-cerise-300 text-gray-900 border-0 font-medium px-8"
             >
               Start Application
               <ArrowRight className="w-4 h-4" />
             </Button>
-          ) : currentStep < 4 ? (
+          ) : currentStep < 3 ? (
             <Button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 bg-shamrock-300 hover:bg-shamrock-400 text-gray-900 border-0 font-medium"
+              className="flex items-center gap-2  bg-cerise-400 hover:bg-cerise-300 text-gray-900 border-0 font-medium"
             >
               Next
               <ArrowRight className="w-4 h-4" />
             </Button>
-          ) : currentStep === 4 ? (
+          ) : currentStep === 3 ? (
             <Button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 bg-shamrock-300 hover:bg-shamrock-400 text-gray-900 border-0 font-medium"
+              className="flex items-center gap-2 bg-picton-blue-300 hover:bg-picton-blue-400 text-gray-900 border-0 font-medium"
             >
               Review Application
               <Eye className="w-4 h-4" />
             </Button>
           ) : (
             <Button
-              type="button"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="flex items-center gap-2 bg-shamrock-300 hover:bg-shamrock-400 text-gray-900 border-0 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="animate-spin h-4 w-4 border-2 border-gray-900 border-t-transparent rounded-full" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  Submit Application
-                  <Send className="w-4 h-4" />
-                </>
-              )}
-            </Button>
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="flex items-center gap-2 bg-picton-blue-300 hover:bg-picton-blue-400 text-gray-900 border-0 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? (
+              <>
+                <span className="animate-spin h-4 w-4 border-2 border-gray-900 border-t-transparent rounded-full" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                Submit Application
+                <Send className="w-4 h-4" />
+              </>
+            )}
+          </Button>
           )}
         </div>
       </Card>

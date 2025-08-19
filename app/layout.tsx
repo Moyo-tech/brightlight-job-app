@@ -7,8 +7,8 @@ import mylogo from "../public/logomark.png"
 <meta name="apple-mobile-web-app-title" content="MyWebSite" />
 
 export const metadata: Metadata = {
-  title: "EduRepublic - Job Application",
-  description: "Apply for positions at EduRepublic",
+  title: "Brightlight - Job Application",
+  description: "Apply for positions at Brightlight",
   icons: {
   icon: "/web-app-manifest-192x192.png",
   shortcut: "/web-app-manifest-192x192.png",

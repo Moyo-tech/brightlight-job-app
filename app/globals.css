@@ -38,17 +38,17 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   /* Shamrock Color Palette */
-  --color-shamrock-50: #ecfdf4;
-  --color-shamrock-100: #d1fae3;
-  --color-shamrock-200: #a7f3cd;
-  --color-shamrock-300: #5be4a8;
-  --color-shamrock-400: #34d392;
-  --color-shamrock-500: #10b97a;
-  --color-shamrock-600: #059663;
-  --color-shamrock-700: #047852;
-  --color-shamrock-800: #065f42;
-  --color-shamrock-900: #064e38;
-  --color-shamrock-950: #022c20;
+  --color-shamblue-50: #effaff;
+  --color-shamblue-100: #dff4ff;
+  --color-shamrock-200: #b8ebff;
+  --color-shamrock-300: #78dcff;
+  --color-shamrock-400: #31caff;
+  --color-shamrock-500: #16bef9;
+  --color-shamrock-600: #0090ce;
+  --color-shamrock-700: #0073a7;
+  --color-shamrock-800: #036189;
+  --color-shamrock-900: #095071;
+  --color-shamrock-950: #06324b;
 }
 
 .dark {
@@ -85,17 +85,44 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   /* Shamrock Color Palette */
-  --color-shamrock-50: #ecfdf4;
-  --color-shamrock-100: #d1fae3;
-  --color-shamrock-200: #a7f3cd;
-  --color-shamrock-300: #5be4a8;
-  --color-shamrock-400: #34d392;
-  --color-shamrock-500: #10b97a;
-  --color-shamrock-600: #059663;
-  --color-shamrock-700: #047852;
-  --color-shamrock-800: #065f42;
-  --color-shamrock-900: #064e38;
-  --color-shamrock-950: #022c20;
+  --color-shamrock-50: #effaff;
+  --color-shamrock-100: #dff4ff;
+  --color-shamrock-200: #b8ebff;
+  --color-shamrock-300: #78dcff;
+  --color-shamrock-400: #31caff;
+  --color-shamrock-500: #16bef9;
+  --color-shamrock-600: #0090ce;
+  --color-shamrock-700: #0073a7;
+  --color-shamrock-800: #036189;
+  --color-shamrock-900: #095071;
+  --color-shamrock-950: #06324b;
+
+    /* Picton Blue Color Palette */
+    --color-picton-blue-50: #effaff;
+    --color-picton-blue-100: #dff4ff;
+    --color-picton-blue-200: #b8ebff;
+    --color-picton-blue-300: #78dcff;
+    --color-picton-blue-400: #31caff;
+    --color-picton-blue-500: #16bef9;
+    --color-picton-blue-600: #0090ce;
+    --color-picton-blue-700: #0073a7;
+    --color-picton-blue-800: #036189;
+    --color-picton-blue-900: #095071;
+    --color-picton-blue-950: #06324b;
+
+  /* Shamrock CERISE Palette */
+
+  --color-cerise-50: #fdf2f8;
+  --color-cerise-100: #fce7f4;
+  --color-cerise-200: #fbcfea;
+  --color-cerise-300: #f9a8d8;
+  --color-cerise-400: #f472bc;
+  --color-cerise-500: #ec48a0;
+  --color-cerise-600: #d32379;
+  --color-cerise-700: #be1864;
+  --color-cerise-800: #9d1753;
+  --color-cerise-900: #831848;
+  --color-cerise-950: #500727;
 }
 
 @theme inline {
@@ -147,6 +174,33 @@
   --color-shamrock-800: #065f42;
   --color-shamrock-900: #064e38;
   --color-shamrock-950: #022c20;
+
+    /* Picton Blue Color Palette */
+    --color-picton-blue-50: #effaff;
+    --color-picton-blue-100: #dff4ff;
+    --color-picton-blue-200: #b8ebff;
+    --color-picton-blue-300: #78dcff;
+    --color-picton-blue-400: #31caff;
+    --color-picton-blue-500: #16bef9;
+    --color-picton-blue-600: #0090ce;
+    --color-picton-blue-700: #0073a7;
+    --color-picton-blue-800: #036189;
+    --color-picton-blue-900: #095071;
+    --color-picton-blue-950: #06324b;
+
+    /* Shamrock CERISE Palette */
+
+    --color-cerise-50: #fdf2f8;
+    --color-cerise-100: #fce7f4;
+    --color-cerise-200: #fbcfea;
+    --color-cerise-300: #f9a8d8;
+    --color-cerise-400: #f472bc;
+    --color-cerise-500: #ec48a0;
+    --color-cerise-600: #d32379;
+    --color-cerise-700: #be1864;
+    --color-cerise-800: #9d1753;
+    --color-cerise-900: #831848;
+    --color-cerise-950: #500727;
 }
 
 @layer base {
@@ -155,6 +209,6 @@
   }
   body {
     @apply text-foreground;
-    background-color: #00454d;
+    background-color: #095071;
   }
 }
