@@ -282,39 +282,85 @@ export default function JobApplicationForm() {
 
   const handleSubmit = async () => {
     if (validateStep(4)) {
-      setIsSubmitting(true);
+      setIsSubmitting(true)
 
       try {
-        const form = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
+        // Filter formData to only include relevant fields based on position
+        const filteredData: any = {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          education: formData.education,
+          fieldOfStudy: formData.fieldOfStudy,
+          position: formData.position,
+        }
+
+        // Add position-specific fields only if they're relevant
+        if (formData.position === "School Teacher" || formData.position === "Assistant School Teacher") {
+          filteredData.teachingQualification = formData.teachingQualification
+          filteredData.teachingExperience = formData.teachingExperience
+          filteredData.subjects = formData.subjects?.join(", ")
+          filteredData.gradeLevels = formData.gradeLevels?.join(", ")
+          filteredData.curriculum = formData.curriculum?.join(", ")
+          filteredData.classroomManagement = formData.classroomManagement
+          filteredData.engageStudents = formData.engageStudents
+          filteredData.lessonPlans = formData.lessonPlans
+          filteredData.availability = formData.availability
+        } else if (formData.position === "Bus Assistant") {
+          filteredData.busAssistantRole = formData.busAssistantRole
+          filteredData.childExperience = formData.childExperience
+          filteredData.morningAfternoonAvailable = formData.morningAfternoonAvailable
+          filteredData.childSafety = formData.childSafety
+        } else if (formData.position === "School Cleaner") {
+          filteredData.schoolEnvironmentExperience = formData.schoolEnvironmentExperience
+          filteredData.livesNearSchool = formData.livesNearSchool
+          filteredData.startAvailability = formData.startAvailability
+        } else if (formData.position === "Child Minder") {
+          filteredData.childMindingExperience = formData.childMindingExperience
+          filteredData.outdoorSafety = formData.outdoorSafety
+          filteredData.workWithTeacher = formData.workWithTeacher
+          filteredData.multipleChildren = formData.multipleChildren
+        }
+
+        const form = new FormData()
+        Object.entries(filteredData).forEach(([key, value]) => {
           if (value instanceof File) {
-            form.append(key, value); // send file
+            form.append(key, value)
           } else if (value) {
-            form.append(key, value as string); // send text
+            form.append(key, value as string)
           }
-        });
+        })
+
+        // Add files
+        if (formData.coverLetter) {
+          form.append("coverLetter", formData.coverLetter)
+        }
+        if (formData.resume) {
+          form.append("resume", formData.resume)
+        }
 
         const response = await fetch("https://usebasin.com/f/cab5adc1635c", {
           method: "POST",
           body: form,
-          headers: { Accept: "application/json" }, // 👈 Basin recommends this
-        });
+          headers: { Accept: "application/json" },
+        })
 
         if (response.ok) {
-          setIsSubmitted(true);
+          setIsSubmitted(true)
         } else {
-          const errorData = await response.json();
-          console.error("Submission error:", errorData);
-          alert("Something went wrong. Please try again.");
+          const errorData = await response.json()
+          console.error("Submission error:", errorData)
+          alert("Something went wrong. Please try again.")
         }
       } catch (error) {
-        console.error("Network error:", error);
-        alert("Error submitting form.");
+        console.error("Network error:", error)
+        alert("Error submitting form.")
       } finally {
-        setIsSubmitting(false);
+        setIsSubmitting(false)
       }
     }
-  };
+  }
+
 
   const renderWelcomeScreen = () => (
     <motion.div
@@ -1348,10 +1394,12 @@ export default function JobApplicationForm() {
                   <span className="text-gray-400">Understanding of Role:</span>
                   <p className="text-white">{formData.busAssistantRole}</p>
                 </div>
+
                 <div>
                   <span className="text-gray-400">Child Experience:</span>
                   <p className="text-white">{formData.childExperience}</p>
                 </div>
+
                 <div>
                   <span className="text-gray-400">
                     Morning/Afternoon Availability:
@@ -1360,6 +1408,13 @@ export default function JobApplicationForm() {
                     {formData.morningAfternoonAvailable}
                   </p>
                 </div>
+
+
+                <div>
+                  <span className="text-gray-400">Child Safety:</span>
+                  <p className="text-white">{formData.childSafety}</p>
+                </div>
+
               </>
             )}
 
